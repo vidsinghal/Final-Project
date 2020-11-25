@@ -50,11 +50,15 @@ class BaseReplacementPolicy : public SimObject
       * Convenience typedef.
       */
     typedef BaseReplacementPolicyParams Params;
+    
+    int flag;
+
+    const Params * param;
 
     /**
      * Construct and initiliaze this replacement policy.
      */
-    BaseReplacementPolicy(const Params *p) : SimObject(p) {}
+    BaseReplacementPolicy(const Params *p) : SimObject(p), param(p) {}
 
     /**
      * Destructor.

@@ -36,11 +36,13 @@
 BIPRP::BIPRP(const Params *p)
     : LRURP(p), btp(p->btp)
 {
+    flag = 0;
 }
 
 void
 BIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
+    if (flag == 1){
     std::shared_ptr<LRUReplData> casted_replacement_data =
         std::static_pointer_cast<LRUReplData>(replacement_data);
 
@@ -51,6 +53,13 @@ BIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
         // Make their timestamps as old as possible, so that they become LRU
         casted_replacement_data->lastTouchTick = 1;
     }
+    }
+    else{
+        
+        // Set last touch timestamp
+        std::static_pointer_cast<LRUReplData>(replacement_data)->lastTouchTick = curTick();
+    }
+
 }
 
 BIPRP*

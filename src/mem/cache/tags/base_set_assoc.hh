@@ -61,6 +61,8 @@
 #include "mem/cache/tags/indexing_policies/base.hh"
 #include "mem/packet.hh"
 #include "params/BaseSetAssoc.hh"
+#include "mem/cache/replacement_policies/lru_rp.hh"
+#include "mem/cache/replacement_policies/bip_rp.hh"
 
 /**
  * A basic cache tag store.
@@ -85,6 +87,18 @@ class BaseSetAssoc : public BaseTags
     BaseReplacementPolicy *replacementPolicy;
 
   public:
+    
+    //this function will change the replacement policy of the follwer blocks on demand
+    void setFollowerSetReplacementPolicy(BaseReplacementPolicy * newReplacementPolicy);
+
+    //adding a data structure for the follower sets 
+   // std::vector<CacheBlk*> LRUsets;
+   // std::vector<CacheBlk*> BIPsets;
+   // std::vector<CacheBlk*> followerSets;
+
+    //adding a map that tracks the flag for the replacement value
+   // std::map<CacheBlk*, int> blockMap;
+     
     /** Convenience typedef. */
      typedef BaseSetAssocParams Params;
 
@@ -196,7 +210,16 @@ class BaseSetAssoc : public BaseTags
         stats.tagsInUse++;
 
         // Update replacement policy
-        replacementPolicy->reset(blk->replacementData);
+        if (blockMap[blk] == 0){
+            replacementPolicy->flag = 0;
+            replacementPolicy->reset(blk->replacementData);
+        }
+        else{
+            replacementPolicy->flag = 1;
+            replacementPolicy->reset(blk->replacementData);
+        }
+
+        
     }
 
     /**

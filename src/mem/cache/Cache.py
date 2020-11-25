@@ -94,12 +94,16 @@ class BaseCache(ClockedObject):
 
     is_read_only = Param.Bool(False, "Is this cache read only (e.g. inst)")
 
+    #there is no prefetcher attached in to the base cache.
     prefetcher = Param.BasePrefetcher(NULL,"Prefetcher attached to cache")
     prefetch_on_access = Param.Bool(False,
          "Notify the hardware prefetcher on every access (not just misses)")
 
     tags = Param.BaseTags(BaseSetAssoc(), "Tag store")
-    replacement_policy = Param.BaseReplacementPolicy(LRURP(),
+    
+    #changing the replacement policies of the caches here, need to check if different replacement policies are working or not
+
+    replacement_policy = Param.BaseReplacementPolicy(BIPRP(),
         "Replacement policy")
 
     compressor = Param.BaseCacheCompressor(NULL, "Cache compressor.")

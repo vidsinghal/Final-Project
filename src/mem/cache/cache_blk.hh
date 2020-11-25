@@ -87,6 +87,10 @@ class CacheBlk : public ReplaceableEntry
     /** Task Id associated with this block */
     uint32_t task_id;
 
+    //adding a field for the replacementPolicy to be used by the block, will be handy when changing the replacement policy
+    //in the middle of execution
+    BaseReplacementPolicy *replacementPolicy;
+
     /** Data block tag value. */
     Addr tag;
     /**

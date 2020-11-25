@@ -97,6 +97,13 @@ class BaseCache : public ClockedObject
         MSHRQueue_WriteBuffer
     };
 
+    //defining a struct with 10 bit to serve as a global counter
+    struct {
+      unsigned counter:10;
+      unsigned temp:10;
+
+    } globalCounter;
+
   public:
     /**
      * Reasons for caches to be blocked.

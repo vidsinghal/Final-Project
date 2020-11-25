@@ -116,6 +116,7 @@ BaseCache::BaseCache(const BaseCacheParams *p, unsigned blk_size)
     // forward snoops is overridden in init() once we can query
     // whether the connected master is actually snooping or not
 
+    globalCounter.counter = 0; 
     tempBlock = new TempCacheBlk(blkSize);
 
     tags->tagsInit();
@@ -375,6 +376,41 @@ BaseCache::recvTimingReq(PacketPtr pkt)
         handleTimingReqMiss(pkt, blk, forward_time, request_time);
 
         ppMiss->notify(pkt);
+        
+        //add code to update the global counter. 
+        //update the replacement policies based on the MSB of the global counter
+
+        if(tags->blockMap[blk] == 0){
+
+           globalCounter.counter += 1;
+
+        } //that means this block is currently using LRU
+        else if (tags->blockMap[blk] == 1){
+
+            globalCounter.counter -= 1;
+        } //that means this block is currently using BIP
+
+        //go over the global counter and see what the MSB of the global counter is
+        globalCounter.temp = globalCounter.counter;
+        if (globalCounter.temp >> 9 == 0){
+
+            for (auto blocks : tags->followerSets){
+                tags->blockMap[blocks] = 0;
+            }
+
+
+        }//follower use the LRU policy
+        else if (globalCounter.temp >> 9 == 1){
+
+            for (auto blocks : tags->followerSets){
+
+                tags->blockMap[blocks] = 1;
+
+            }
+
+        } //follower use the BIP policy
+
+
     }
 
     if (prefetcher) {

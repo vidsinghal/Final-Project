@@ -155,6 +155,15 @@ class BaseTags : public ClockedObject
     } stats;
 
   public:
+    
+    //adding a data structure for the follower sets 
+    std::vector<CacheBlk*> LRUsets;
+    std::vector<CacheBlk*> BIPsets;
+    std::vector<CacheBlk*> followerSets;
+
+    //adding a map that tracks the flag for the replacement value
+    std::map<CacheBlk*, int> blockMap;
+
     typedef BaseTagsParams Params;
     BaseTags(const Params *p);
 

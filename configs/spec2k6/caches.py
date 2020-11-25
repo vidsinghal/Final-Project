@@ -74,7 +74,7 @@ class L1ICache(L1Cache):
 
     # Set the default size
     size = '16kB'
-
+   
     SimpleOpts.add_option('--l1i_size',
                           help="L1 instruction cache size. Default: %s" % size)
 
@@ -93,6 +93,8 @@ class L1DCache(L1Cache):
 
     # Set the default size
     size = '64kB'
+    #tags = BRRIPRP()
+
 
     SimpleOpts.add_option('--l1d_size',
                           help="L1 data cache size. Default: %s" % size)
@@ -102,6 +104,7 @@ class L1DCache(L1Cache):
         if not opts or not opts.l1d_size:
             return
         self.size = opts.l1d_size
+        #self.tags = BRRIPRP()
 
     def connectCPU(self, cpu):
         """Connect this cache's port to a CPU dcache port"""
