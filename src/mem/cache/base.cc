@@ -381,13 +381,15 @@ BaseCache::recvTimingReq(PacketPtr pkt)
         //update the replacement policies based on the MSB of the global counter
 
         if(tags->blockMap[blk] == 0){
-
-           globalCounter.counter += 1;
+            if(std::find(tags->LRUsets.begin(), tags->LRUsets.end(), blk) != tags->LRUsets.end()){
+                globalCounter.counter += 1;
+            }
 
         } //that means this block is currently using LRU
         else if (tags->blockMap[blk] == 1){
-
-            globalCounter.counter -= 1;
+              if(std::find(tags->BIPsets.begin(), tags->BIPsets.end(), blk) != tags->BIPsets.end()){
+                  globalCounter.counter -= 1;
+              }
         } //that means this block is currently using BIP
 
         //go over the global counter and see what the MSB of the global counter is
