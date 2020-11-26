@@ -129,6 +129,35 @@ class BaseSetAssoc : public BaseTags
     {
         CacheBlk *blk = findBlock(addr, is_secure);
 
+        uint32_t whichSet = indexingPolicy->extractSet(addr);
+        //std::cout << "This is the whichSet: " << whichSet << std::endl;
+        if (blk == nullptr){
+            //cache miss
+            //find which set this belongs to
+
+            if (std::find(indexingPolicy->LRUSETS.begin(), indexingPolicy->LRUSETS.end(), whichSet) != indexingPolicy->LRUSETS.end()){                
+                PSEL_counter.counter += 1;
+              //  std::cout << "PSEL incremented in LRU: " << PSEL_counter.counter << std::endl;
+            }
+            else if (std::find(indexingPolicy->BIPSETS.begin(), indexingPolicy->BIPSETS.end(), whichSet) != indexingPolicy->BIPSETS.end()){
+                PSEL_counter.counter -= 1;
+                // std::cout << "PSEL incremented in BIP: " << PSEL_counter.counter << std::endl;
+            }
+
+           //check the MSB of the global counter
+           PSEL_counter.temp = PSEL_counter.counter;
+            if (!((PSEL_counter.temp >> 9) & 1)){
+
+                choosePolicy = 0;
+                
+            }
+            else if ((PSEL_counter.temp >> 9) & 1){
+
+                choosePolicy = 1;
+            }
+
+        }
+
         // Access all tags in parallel, hence one in each way.  The data side
         // either accesses all blocks in parallel, or one block sequentially on
         // a hit.  Sequential access with a miss doesn't access data.
@@ -200,12 +229,26 @@ class BaseSetAssoc : public BaseTags
 
         //Update replacement policy
         //a value of 0 in the blockMap means that the block is set to be used with the LIP policy
-        if (blockMap[blk] == 0){
+        //check if the blk belongs in the follow set.
+        uint32_t setOfBlock =  blk->getSet();     
+
+        if (std::find(indexingPolicy->FOLLOWSETS.begin(), indexingPolicy->FOLLOWSETS.end(), setOfBlock) != indexingPolicy->FOLLOWSETS.end()){
+            if (choosePolicy == 0){
+                replacementPolicy->flag = 0;
+                replacementPolicy->reset(blk->replacementData);
+            }
+            //else a value of 1 which means that the block is set to use the BIP policy
+            else{
+                replacementPolicy->flag = 1;
+                replacementPolicy->reset(blk->replacementData);
+            }
+        }
+        else if (std::find(indexingPolicy->LRUSETS.begin(), indexingPolicy->LRUSETS.end(), setOfBlock) != indexingPolicy->LRUSETS.end()){
             replacementPolicy->flag = 0;
             replacementPolicy->reset(blk->replacementData);
+
         }
-        //else a value of 1 which means that the block is set to use the BIP policy
-        else{
+        else if (std::find(indexingPolicy->BIPSETS.begin(), indexingPolicy->BIPSETS.end(), setOfBlock) != indexingPolicy->BIPSETS.end()){
             replacementPolicy->flag = 1;
             replacementPolicy->reset(blk->replacementData);
         }

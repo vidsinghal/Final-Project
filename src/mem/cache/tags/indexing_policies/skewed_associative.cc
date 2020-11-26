@@ -194,6 +194,12 @@ SkewedAssociative::extractSet(const Addr addr, const uint32_t way) const
     return skew(addr >> setShift, way) & setMask;
 }
 
+uint32_t
+SkewedAssociative::extractSet(const Addr addr) const
+{
+    return (addr >> setShift) & setMask;
+}
+
 Addr
 SkewedAssociative::regenerateAddr(const Addr tag,
                                   const ReplaceableEntry* entry) const

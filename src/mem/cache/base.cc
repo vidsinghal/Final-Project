@@ -380,12 +380,12 @@ BaseCache::recvTimingReq(PacketPtr pkt)
         }
 
         handleTimingReqHit(pkt, blk, request_time);
-        if (std::find(tags->LRUsets.begin(), tags->LRUsets.end(), blk) != tags->LRUsets.end()){
-                globalCounter.counter -= 1;
-        }
-        else if (std::find(tags->BIPsets.begin(), tags->BIPsets.end(), blk) != tags->BIPsets.end()){
-                globalCounter.counter += 1;
-        }
+        //if (std::find(tags->LRUsets.begin(), tags->LRUsets.end(), blk) != tags->LRUsets.end()){
+        //        globalCounter.counter -= 1;
+       // }
+       // else if (std::find(tags->BIPsets.begin(), tags->BIPsets.end(), blk) != tags->BIPsets.end()){
+       //         globalCounter.counter += 1;
+       // }
 
         // for (auto blks : tags->LRUsets){
         //     if (blks == blk){
@@ -402,20 +402,20 @@ BaseCache::recvTimingReq(PacketPtr pkt)
         //         //std::cout << "BIP blks: " << blks << std::endl;
         //    }
         // }
-        globalCounter.temp = globalCounter.counter;
+       // globalCounter.temp = globalCounter.counter;
         //std::cout << "The global counter is: " << globalCounter.counter << std::endl;
         //std::cout << "The global counter MSB is: " << (globalCounter.temp >> 9) << std::endl;
         //globalCounter.temp = globalCounter.counter;
-        if (!((globalCounter.temp >> 9) & 1)){
-            for (auto blocks : tags->followerSets){
-                tags->blockMap[blocks] = 0;
-            }
-        }
-        else if ((globalCounter.temp >> 9) & 1){
-            for (auto blocks : tags->followerSets){
-                tags->blockMap[blocks] = 1;
-            }
-        }
+        //if (!((globalCounter.temp >> 9) & 1)){
+        //    for (auto blocks : tags->followerSets){
+        //        tags->blockMap[blocks] = 0;
+        //    }
+        //}
+        //else if ((globalCounter.temp >> 9) & 1){
+        //    for (auto blocks : tags->followerSets){
+        //        tags->blockMap[blocks] = 1;
+        //    }
+        //}
 
     } else {
         handleTimingReqMiss(pkt, blk, forward_time, request_time);
@@ -1147,6 +1147,15 @@ BaseCache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
     // Access block in the tags
     Cycles tag_latency(0);
     blk = tags->accessBlock(pkt->getAddr(), pkt->isSecure(), tag_latency);
+    //Here inside accessBlock I can access the which set this query belongs to
+
+
+
+
+
+
+
+
     DPRINTF(Cache, "%s for %s %s\n", __func__, pkt->print(),
             blk ? "hit " + blk->print() : "miss");
 

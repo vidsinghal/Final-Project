@@ -66,11 +66,11 @@ BaseSetAssoc::tagsInit()
     // Initialize all blocks according to the Quershi paper. 
     // All the LRU sets have position from 0, 33, ...
     // All the BIP sets have position from 32, 64, ...
-    std::cout << "The number of blocks are: " << numBlocks << std::endl;    
+    //std::cout << "The number of blocks are: " << numBlocks << std::endl;    
 
     int setDuelingSize = numBlocks / 32;
 
-    std::cout << "The set Dueling size is: : " << setDuelingSize << std::endl;
+    //std::cout << "The set Dueling size is: : " << setDuelingSize << std::endl;
 
     for (unsigned blk_index = 0; blk_index < numBlocks; blk_index++) {
         // Locate next cache block

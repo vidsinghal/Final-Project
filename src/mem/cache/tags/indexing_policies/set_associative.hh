@@ -85,7 +85,7 @@ class SetAssociative : public BaseIndexingPolicy
      * @param addr The address to calculate the set for.
      * @return The set index for given combination of address and way.
      */
-    virtual uint32_t extractSet(const Addr addr) const;
+    uint32_t extractSet(const Addr addr) const override;
 
   public:
     /**

@@ -103,10 +103,11 @@ class BaseIndexingPolicy : public SimObject
      * Construct and initialize this policy.
      */
     BaseIndexingPolicy(const Params *p);
-
-    std::vector<int> LRUSETS;
-    std::vector<int> BIPSETS;
-    std::vector<int> FOLLOWSETS;
+    
+    //vector tables storing the sets, LRU, BIP and FOLLOW sets
+    std::vector<uint32_t> LRUSETS;
+    std::vector<uint32_t> BIPSETS;
+    std::vector<uint32_t> FOLLOWSETS;
 
     /**
      * Destructor.
@@ -147,6 +148,8 @@ class BaseIndexingPolicy : public SimObject
      * @param addr The addr to a find possible entries for.
      * @return The possible entries.
      */
+    virtual uint32_t extractSet(const Addr addr) const  = 0;
+
     virtual std::vector<ReplaceableEntry*> getPossibleEntries(const Addr addr)
                                                                     const = 0;
 

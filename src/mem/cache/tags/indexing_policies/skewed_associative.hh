@@ -133,6 +133,9 @@ class SkewedAssociative : public BaseIndexingPolicy
      * @param way The way to get the set from.
      * @return The set index for given combination of address and way.
      */
+    
+    uint32_t extractSet(const Addr addr) const override;
+
     uint32_t extractSet(const Addr addr, const uint32_t way) const;
 
   public:

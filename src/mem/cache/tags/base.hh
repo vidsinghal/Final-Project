@@ -161,6 +161,15 @@ class BaseTags : public ClockedObject
     std::vector<CacheBlk*> LRUsets;
     std::vector<CacheBlk*> BIPsets;
     std::vector<CacheBlk*> followerSets;
+    
+    //the 10 bit PSEL counter used in Quershi paper
+    struct {
+      unsigned counter:10;
+      unsigned temp:10;
+
+    } PSEL_counter;
+
+    int choosePolicy;
 
     //adding a map that tracks the flag for the replacement value of each blk in real time
     std::map<CacheBlk*, int> blockMap;

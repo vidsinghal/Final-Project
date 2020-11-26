@@ -99,8 +99,8 @@ class BaseCache : public ClockedObject
 
     //defining a struct with 10 bit inner counter to serve as a global counter, (imitates PSEL in the Quershi paper)
     struct {
-      unsigned counter:10;
-      unsigned temp:10;
+      unsigned counter:32;
+      unsigned temp:32;
 
     } globalCounter;
 

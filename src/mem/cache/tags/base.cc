@@ -65,6 +65,8 @@ BaseTags::BaseTags(const Params *p)
       stats(*this)
 {
     registerExitCallback(new BaseTagsCallback(this));
+    choosePolicy = 0;
+    PSEL_counter.counter = 0;
 }
 
 ReplaceableEntry*
