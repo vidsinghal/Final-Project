@@ -304,6 +304,7 @@ BaseCache::handleTimingReqMiss(PacketPtr pkt, MSHR *mshr, CacheBlk *blk,
             allocateWriteBuffer(pkt, forward_time);
         } else {
             if (blk && blk->isValid()) {
+                //std::cout << blk << std::endl;
                 // If we have a write miss to a valid block, we
                 // need to mark the block non-readable.  Otherwise
                 // if we allow reads while there's an outstanding
@@ -328,6 +329,13 @@ BaseCache::handleTimingReqMiss(PacketPtr pkt, MSHR *mshr, CacheBlk *blk,
             // lookupLatency component.
             allocateMissBuffer(pkt, forward_time);
         }
+
+        //need to take care of mshr misses as well, take care of the counters
+
+
+
+
+
     }
 }
 
@@ -372,46 +380,106 @@ BaseCache::recvTimingReq(PacketPtr pkt)
         }
 
         handleTimingReqHit(pkt, blk, request_time);
+        if (std::find(tags->LRUsets.begin(), tags->LRUsets.end(), blk) != tags->LRUsets.end()){
+                globalCounter.counter -= 1;
+        }
+        else if (std::find(tags->BIPsets.begin(), tags->BIPsets.end(), blk) != tags->BIPsets.end()){
+                globalCounter.counter += 1;
+        }
+
+        // for (auto blks : tags->LRUsets){
+        //     if (blks == blk){
+        //        globalCounter.counter -= 1;
+        //        break;
+        //        //std::cout << "LRU blks: " << blks << std::endl;
+        //     }
+           
+        // }
+        // for (auto blks : tags->BIPsets){
+        //     if (blks == blk){
+        //         globalCounter.counter += 1;
+        //         break;
+        //         //std::cout << "BIP blks: " << blks << std::endl;
+        //    }
+        // }
+        globalCounter.temp = globalCounter.counter;
+        //std::cout << "The global counter is: " << globalCounter.counter << std::endl;
+        //std::cout << "The global counter MSB is: " << (globalCounter.temp >> 9) << std::endl;
+        //globalCounter.temp = globalCounter.counter;
+        if (!((globalCounter.temp >> 9) & 1)){
+            for (auto blocks : tags->followerSets){
+                tags->blockMap[blocks] = 0;
+            }
+        }
+        else if ((globalCounter.temp >> 9) & 1){
+            for (auto blocks : tags->followerSets){
+                tags->blockMap[blocks] = 1;
+            }
+        }
+
     } else {
         handleTimingReqMiss(pkt, blk, forward_time, request_time);
 
         ppMiss->notify(pkt);
         
-        //add code to update the global counter. 
-        //update the replacement policies based on the MSB of the global counter
+        //update the global counter based of which set the missed block belongs to       
+        //if (std::find(tags->LRUsets.begin(), tags->LRUsets.end(), blk) != tags->LRUsets.end()){
+        //        globalCounter.counter += 1;
+       // }
+        //else if (std::find(tags->BIPsets.begin(), tags->BIPsets.end(), blk) != tags->BIPsets.end()){
+        //        globalCounter.counter -= 1;
+       // }
+       
+      // CacheBlk *block = tags->findBlock(pkt->getAddr(), pkt->isSecure());
+       //std::cout << block << std::endl;
+    //    for (auto blks : tags->LRUsets){
+           
+    //        if (blks == blk){
+    //            globalCounter.counter += 1;
+    //            std::cout << "LRU blks: " << blks << std::endl;
+    //        }
+           
+    //        }
 
-        if(tags->blockMap[blk] == 0){
-            if(std::find(tags->LRUsets.begin(), tags->LRUsets.end(), blk) != tags->LRUsets.end()){
-                globalCounter.counter += 1;
-            }
+    //    for (auto blks : tags->BIPsets){
 
-        } //that means this block is currently using LRU
-        else if (tags->blockMap[blk] == 1){
-              if(std::find(tags->BIPsets.begin(), tags->BIPsets.end(), blk) != tags->BIPsets.end()){
-                  globalCounter.counter -= 1;
-              }
-        } //that means this block is currently using BIP
+    //        if (blks == blk){
+    //             globalCounter.counter -= 1;
+    //             std::cout << "BIP blks: " << blks << std::endl;
+    //        }
+    //     }
+
+        //  std::vector<int> LRUSETS;
+        // std::vector<int> BIPSETS;
+        // std::vector<int> FOLLOWSETS;
+
+
+        //int setId = tags->indexingPolicy->extractSet(pkt->getAddr()); 
+    
+
+
+        //if (tags->blockMap[blk] == 0){
+        //        globalCounter.counter += 1;
+       // }
+       // else if (tags->blockMap[blk] == 1){
+       //         globalCounter.counter -= 1;
+       // }
 
         //go over the global counter and see what the MSB of the global counter is
-        globalCounter.temp = globalCounter.counter;
-        if (globalCounter.temp >> 9 == 0){
-
-            for (auto blocks : tags->followerSets){
-                tags->blockMap[blocks] = 0;
-            }
-
-
-        }//follower use the LRU policy
-        else if (globalCounter.temp >> 9 == 1){
-
-            for (auto blocks : tags->followerSets){
-
-                tags->blockMap[blocks] = 1;
-
-            }
-
-        } //follower use the BIP policy
-
+        // globalCounter.temp = globalCounter.counter;
+        // //std::cout << "The global counter is: " << globalCounter.counter << std::endl;
+        // //std::cout << "The global counter MSB is: " << (globalCounter.temp >> 9) << std::endl;
+        // //globalCounter.temp = globalCounter.counter;
+        // if (!((globalCounter.temp >> 9) & 1)){
+        //     for (auto blocks : tags->followerSets){
+        //         tags->blockMap[blocks] = 0;
+        //     }
+        // }
+        // else if ((globalCounter.temp >> 9) & 1){
+        //     for (auto blocks : tags->followerSets){
+        //         tags->blockMap[blocks] = 1;
+        //     }
+        // }
 
     }
 
@@ -802,6 +870,7 @@ BaseCache::getNextQueueEntry()
 
     // fall through... no pending requests.  Try a prefetch.
     assert(!miss_mshr && !wq_entry);
+    std::cout << prefetcher << std::endl;
     if (prefetcher && mshrQueue.canPrefetch()) {
         // If we have a miss queue slot, we can try a prefetch
         PacketPtr pkt = prefetcher->getPacket();
@@ -1078,7 +1147,6 @@ BaseCache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
     // Access block in the tags
     Cycles tag_latency(0);
     blk = tags->accessBlock(pkt->getAddr(), pkt->isSecure(), tag_latency);
-
     DPRINTF(Cache, "%s for %s %s\n", __func__, pkt->print(),
             blk ? "hit " + blk->print() : "miss");
 

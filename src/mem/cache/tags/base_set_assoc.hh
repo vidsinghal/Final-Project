@@ -87,17 +87,6 @@ class BaseSetAssoc : public BaseTags
     BaseReplacementPolicy *replacementPolicy;
 
   public:
-    
-    //this function will change the replacement policy of the follwer blocks on demand
-    void setFollowerSetReplacementPolicy(BaseReplacementPolicy * newReplacementPolicy);
-
-    //adding a data structure for the follower sets 
-   // std::vector<CacheBlk*> LRUsets;
-   // std::vector<CacheBlk*> BIPsets;
-   // std::vector<CacheBlk*> followerSets;
-
-    //adding a map that tracks the flag for the replacement value
-   // std::map<CacheBlk*, int> blockMap;
      
     /** Convenience typedef. */
      typedef BaseSetAssocParams Params;
@@ -209,11 +198,13 @@ class BaseSetAssoc : public BaseTags
         // Increment tag counter
         stats.tagsInUse++;
 
-        // Update replacement policy
+        //Update replacement policy
+        //a value of 0 in the blockMap means that the block is set to be used with the LIP policy
         if (blockMap[blk] == 0){
             replacementPolicy->flag = 0;
             replacementPolicy->reset(blk->replacementData);
         }
+        //else a value of 1 which means that the block is set to use the BIP policy
         else{
             replacementPolicy->flag = 1;
             replacementPolicy->reset(blk->replacementData);

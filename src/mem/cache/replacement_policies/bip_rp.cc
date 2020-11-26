@@ -42,22 +42,24 @@ BIPRP::BIPRP(const Params *p)
 void
 BIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
+    //std::cout << "The value of flag in the BIPRP reset is: " << flag << std::endl;
     if (flag == 1){
-    std::shared_ptr<LRUReplData> casted_replacement_data =
-        std::static_pointer_cast<LRUReplData>(replacement_data);
+        std::shared_ptr<LRUReplData> casted_replacement_data = std::static_pointer_cast<LRUReplData>(replacement_data);
+        //Entries are inserted as MRU if lower than btp, LRU otherwise
+        if (random_mt.random<unsigned>(1, 100) <= btp) {
+            casted_replacement_data->lastTouchTick = curTick();
+        }
+        else {
+            // Make their timestamps as old as possible, so that they become LRU
+            casted_replacement_data->lastTouchTick = 1;
+        }
+    }
+    else {
 
-    // Entries are inserted as MRU if lower than btp, LRU otherwise
-    if (random_mt.random<unsigned>(1, 100) <= btp) {
-        casted_replacement_data->lastTouchTick = curTick();
-    } else {
-        // Make their timestamps as old as possible, so that they become LRU
-        casted_replacement_data->lastTouchTick = 1;
-    }
-    }
-    else{
-        
         // Set last touch timestamp
-        std::static_pointer_cast<LRUReplData>(replacement_data)->lastTouchTick = curTick();
+        //make it behave like LIP if flag value is 0
+        std::shared_ptr<LRUReplData> casted_replacement_data = std::static_pointer_cast<LRUReplData>(replacement_data);
+        casted_replacement_data->lastTouchTick = 1;
     }
 
 }

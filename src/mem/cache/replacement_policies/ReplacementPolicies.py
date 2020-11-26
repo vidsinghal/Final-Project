@@ -57,7 +57,7 @@ class BIPRP(LRURP):
     type = 'BIPRP'
     cxx_class = 'BIPRP'
     cxx_header = "mem/cache/replacement_policies/bip_rp.hh"
-    btp = Param.Percent(3, "Percentage of blocks to be inserted as MRU")
+    btp = Param.Percent(3.125, "Percentage of blocks to be inserted as MRU")
 
 class LIPRP(BIPRP):
     btp = 0

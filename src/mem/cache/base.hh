@@ -97,7 +97,7 @@ class BaseCache : public ClockedObject
         MSHRQueue_WriteBuffer
     };
 
-    //defining a struct with 10 bit to serve as a global counter
+    //defining a struct with 10 bit inner counter to serve as a global counter, (imitates PSEL in the Quershi paper)
     struct {
       unsigned counter:10;
       unsigned temp:10;

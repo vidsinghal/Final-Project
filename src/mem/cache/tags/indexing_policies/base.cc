@@ -63,7 +63,21 @@ BaseIndexingPolicy::BaseIndexingPolicy(const Params *p)
     fatal_if(assoc <= 0, "associativity must be greater than zero");
 
     // Make space for the entries
+
+    int IndexingOfSets = numSets / 32;
+
     for (uint32_t i = 0; i < numSets; ++i) {
+
+        if (i == 0 || i % (IndexingOfSets + 1) == 0){
+            LRUSETS.push_back(i);
+        }
+        else if(i != 0 && i % (IndexingOfSets - 1) == 0){
+            BIPSETS.push_back(i);
+        }
+        else{
+            FOLLOWSETS.push_back(i);
+        }
+        
         sets[i].resize(assoc);
     }
 }

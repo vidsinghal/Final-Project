@@ -156,12 +156,13 @@ class BaseTags : public ClockedObject
 
   public:
     
-    //adding a data structure for the follower sets 
+    /*****These data structures are being added for simulating the Querishi setDueling replacement policy******/
+    //Adding a data structure for the follower sets, the LRU sets and the BIP sets
     std::vector<CacheBlk*> LRUsets;
     std::vector<CacheBlk*> BIPsets;
     std::vector<CacheBlk*> followerSets;
 
-    //adding a map that tracks the flag for the replacement value
+    //adding a map that tracks the flag for the replacement value of each blk in real time
     std::map<CacheBlk*, int> blockMap;
 
     typedef BaseTagsParams Params;

@@ -104,6 +104,10 @@ class BaseIndexingPolicy : public SimObject
      */
     BaseIndexingPolicy(const Params *p);
 
+    std::vector<int> LRUSETS;
+    std::vector<int> BIPSETS;
+    std::vector<int> FOLLOWSETS;
+
     /**
      * Destructor.
      */
