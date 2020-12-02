@@ -55,6 +55,9 @@
 #include "sim/sim_exit.hh"
 #include "sim/system.hh"
 
+#include <iterator> 
+#include <map> 
+
 BaseTags::BaseTags(const Params *p)
     : ClockedObject(p), blkSize(p->block_size), blkMask(blkSize - 1),
       size(p->size), lookupLatency(p->tag_latency),
@@ -73,6 +76,12 @@ BaseTags::findBlockBySetAndWay(int set, int way) const
     return indexingPolicy->getEntry(set, way);
 }
 
+std::map<Addr, CacheBlk*> mpAddrCacheBlk; //mapping the address and cache blk
+std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_addr_blk_max;
+std::map<unsigned long, CacheBlk*> mpReuseDistCacheBlk; //mapping the reuse distance and the cache blk
+std::map<unsigned long, CacheBlk*>::iterator it_reuse_blk;
+unsigned long reuseDistance;
+
 CacheBlk*
 BaseTags::findBlock(Addr addr, bool is_secure) const
 {
@@ -83,13 +92,32 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
     const std::vector<ReplaceableEntry*> entries =
         indexingPolicy->getPossibleEntries(addr);
 
-    // Search for block
+    //search for block in map
+    it_addr_blk = mpAddrCacheBlk.find(addr);
+    it_addr_blk_max = mpAddrCacheBlk.end();//element just before end
+    //find if address is already present
+    if(it_addr_blk != mpAddrCacheBlk.end()){
+        //reuse distance calculation
+        reuseDistance = std::distance(it_addr_blk, it_addr_blk_max);
+        mpReuseDistCacheBlk.insert({reuseDistance, it_addr_blk->second});
+        //remove block and add it again
+        mpAddrCacheBlk.erase(addr);
+        mpAddrCacheBlk.insert({addr, it_addr_blk->second});
+        // printf("ReuseDist:%lu\n",reuseDistance);
+
+/*      //causes an error   
+        if ((it_addr_blk->second->tag == tag) && it_addr_blk->second->isValid() &&
+        (it_addr_blk->second->isSecure() == is_secure)) {
+            return it_addr_blk->second;
+        } */
+    }
+     // Search for block - original code
     for (const auto& location : entries) {
         CacheBlk* blk = static_cast<CacheBlk*>(location);
         if ((blk->tag == tag) && blk->isValid() &&
             (blk->isSecure() == is_secure)) {
             return blk;
-        }
+        } 
     }
 
     // Did not find block
@@ -113,6 +141,8 @@ BaseTags::insertBlock(const PacketPtr pkt, CacheBlk *blk)
     blk->insert(extractTag(pkt->getAddr()), pkt->isSecure(), master_id,
                 pkt->req->taskId());
 
+    mpAddrCacheBlk.insert({pkt->getAddr(), blk});
+    
     // Check if cache warm up is done
     if (!warmedUp && stats.tagsInUse.value() >= warmupBound) {
         warmedUp = true;

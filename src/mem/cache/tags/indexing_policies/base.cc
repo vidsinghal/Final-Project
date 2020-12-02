@@ -52,6 +52,8 @@
 #include "base/logging.hh"
 #include "mem/cache/replacement_policies/replaceable_entry.hh"
 
+#include <stdio.h>
+
 BaseIndexingPolicy::BaseIndexingPolicy(const Params *p)
     : SimObject(p), assoc(p->assoc),
       numSets(p->size / (p->entry_size * assoc)),
@@ -66,6 +68,7 @@ BaseIndexingPolicy::BaseIndexingPolicy(const Params *p)
     for (uint32_t i = 0; i < numSets; ++i) {
         sets[i].resize(assoc);
     }
+    // printf("VYS %lu %lu %lu\n", sizeof(sets), sizeof(sets[0]), (sizeof(sets)/sizeof(sets[0])));
 }
 
 ReplaceableEntry*
@@ -90,10 +93,12 @@ BaseIndexingPolicy::setEntry(ReplaceableEntry* entry, const uint64_t index)
 
     // Inform the entry its position
     entry->setPosition(set, way);
+    // printf("S-%u W-%u\n", set, way);
 }
 
 Addr
 BaseIndexingPolicy::extractTag(const Addr addr) const
 {
+    // printf("Addr %lu\n", addr);
     return (addr >> tagShift);
 }
