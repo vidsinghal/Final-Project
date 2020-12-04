@@ -17,23 +17,24 @@ class PRP : public BaseReplacementPolicy
         Tick lastTouchTick;
         /** Number of references to this entry since it was reset. */
         unsigned refCount;
+
+        int blockAge; //T_L in the paper
+
+        //check if you need valid bit
         
-        //NL(t) in paper)
-        int blockReuseDistanceFrequency;//replacement block reuse distance is set to 0 initially
         /**
          * Default constructor. Invalidate data.
          */
-        PRPReplData() : lastTouchTick(0), blockReuseDistanceFrequency(0) 
+        PRPReplData() : lastTouchTick(0), refCount(0), blockAge(0) 
         {            
         }
         
     };
 
-    int blockReuseDistance; 
     int blockAge; //maybe not needed
     
-
-    float cacheDistribution;//need to add cache probability distribution
+    // float cacheDistribution;//need to add cache probability distribution
+  
   public:
     
     typedef PRPParams Params;

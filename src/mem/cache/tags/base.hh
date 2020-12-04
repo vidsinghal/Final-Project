@@ -336,7 +336,7 @@ class BaseTags : public ClockedObject
      * @param visitor Visitor to call on each block.
      */
     virtual bool anyBlk(std::function<bool(CacheBlk &)> visitor) = 0;
-
+    
   private:
     /**
      * Update the reference stats using data from the input block

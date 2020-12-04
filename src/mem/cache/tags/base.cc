@@ -58,6 +58,15 @@
 #include <iterator> 
 #include <map> 
 
+std::map<Addr, CacheBlk*> mpAddrCacheBlk; //mapping the address and cache blk
+std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_addr_blk_max;
+std::map<unsigned long, CacheBlk*> mpReuseDistCacheBlk; //mapping the reuse distance and the cache blk
+std::map<unsigned long, CacheBlk*>::iterator it_reuse_blk;
+unsigned long reuseDistance;
+//parameters required for reuse frequency bins
+int reuseFrequency[6];
+std::vector<std::vector<int>> reuseBinRange(6);
+
 BaseTags::BaseTags(const Params *p)
     : ClockedObject(p), blkSize(p->block_size), blkMask(blkSize - 1),
       size(p->size), lookupLatency(p->tag_latency),
@@ -68,6 +77,19 @@ BaseTags::BaseTags(const Params *p)
       stats(*this)
 {
     registerExitCallback(new BaseTagsCallback(this));
+    //initialization for reuseFreq Distribution - hopefully executes only once
+    reuseBinRange.at(0).resize(16);
+    reuseBinRange.at(1).resize(16);
+    reuseBinRange.at(2).resize(32);
+    reuseBinRange.at(3).resize(64);
+    reuseBinRange.at(4).resize(128);
+    reuseBinRange.at(5).resize(10240);//some absurdly high value
+    std::iota(reuseBinRange.at(0).begin(),reuseBinRange.at(0).end(),0);
+    std::iota(reuseBinRange.at(1).begin(),reuseBinRange.at(1).end(),16);
+    std::iota(reuseBinRange.at(2).begin(),reuseBinRange.at(2).end(),32);
+    std::iota(reuseBinRange.at(3).begin(),reuseBinRange.at(3).end(),64);
+    std::iota(reuseBinRange.at(4).begin(),reuseBinRange.at(4).end(),128);
+    std::iota(reuseBinRange.at(5).begin(),reuseBinRange.at(5).end(),256);
 }
 
 ReplaceableEntry*
@@ -75,12 +97,6 @@ BaseTags::findBlockBySetAndWay(int set, int way) const
 {
     return indexingPolicy->getEntry(set, way);
 }
-
-std::map<Addr, CacheBlk*> mpAddrCacheBlk; //mapping the address and cache blk
-std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_addr_blk_max;
-std::map<unsigned long, CacheBlk*> mpReuseDistCacheBlk; //mapping the reuse distance and the cache blk
-std::map<unsigned long, CacheBlk*>::iterator it_reuse_blk;
-unsigned long reuseDistance;
 
 CacheBlk*
 BaseTags::findBlock(Addr addr, bool is_secure) const
@@ -92,21 +108,36 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
     const std::vector<ReplaceableEntry*> entries =
         indexingPolicy->getPossibleEntries(addr);
 
-    //search for block in map
-    it_addr_blk = mpAddrCacheBlk.find(addr);
-    it_addr_blk_max = mpAddrCacheBlk.end();//element just before end
-    //find if address is already present
-    if(it_addr_blk != mpAddrCacheBlk.end()){
-        //reuse distance calculation
-        reuseDistance = std::distance(it_addr_blk, it_addr_blk_max);
+    it_addr_blk = mpAddrCacheBlk.find(addr);                            //search for block in map
+    it_addr_blk_max = mpAddrCacheBlk.end();                             //element just before end
+    
+    if(it_addr_blk != mpAddrCacheBlk.end()){                            //find if address is already present
+        
+        reuseDistance = std::distance(it_addr_blk, it_addr_blk_max);    //reuse distance calculation
         mpReuseDistCacheBlk.insert({reuseDistance, it_addr_blk->second});
-        //remove block and add it again
-        mpAddrCacheBlk.erase(addr);
+        
+        mpAddrCacheBlk.erase(addr);                                     //remove block and add it again
         mpAddrCacheBlk.insert({addr, it_addr_blk->second});
         // printf("ReuseDist:%lu\n",reuseDistance);
 
-/*      //causes an error   
-        if ((it_addr_blk->second->tag == tag) && it_addr_blk->second->isValid() &&
+        for(int i=0;i<6;i++)            //incrementing reuse frequency bins
+        {
+            auto it = std::find(reuseBinRange.at(i).begin(), reuseBinRange.at(i).end(), reuseDistance);
+        
+            if(it != reuseBinRange.at(i).end())
+            {
+                reuseFrequency[i]++;
+            }
+            if (reuseFrequency[i] > 15)
+            {
+                for(int i=0;i<6;i++) //when one bin goes over 15 all are halved
+                {
+                    reuseFrequency[i] = reuseFrequency[i]/2;
+                }
+            }
+        }
+        /*         
+        if ((it_addr_blk->second->tag == tag) && it_addr_blk->second->isValid() &&      //causes an error
         (it_addr_blk->second->isSecure() == is_secure)) {
             return it_addr_blk->second;
         } */

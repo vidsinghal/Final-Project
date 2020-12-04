@@ -51,6 +51,7 @@ LFURP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     // Update reference count
     std::static_pointer_cast<LFUReplData>(replacement_data)->refCount++;
+    // printf("Ref: %u \n",std::static_pointer_cast<LFUReplData>(replacement_data)->refCount);
 }
 
 void
