@@ -144,6 +144,9 @@ class BaseSetAssoc : public BaseTags
                 // std::cout << "PSEL incremented in BIP: " << PSEL_counter.counter << std::endl;
             }
 
+          
+           // std::cout << "The Global Counter: " << PSEL_counter.counter << std::endl;
+
            //check the MSB of the global counter
            PSEL_counter.temp = PSEL_counter.counter;
             if (!((PSEL_counter.temp >> 9) & 1)){
@@ -230,25 +233,32 @@ class BaseSetAssoc : public BaseTags
         //Update replacement policy
         //a value of 0 in the blockMap means that the block is set to be used with the LIP policy
         //check if the blk belongs in the follow set.
-        uint32_t setOfBlock =  blk->getSet();     
+
+
+        //uint32_t setOfBlock =  blk->getSet();
+        uint32_t setOfBlock = indexingPolicy->extractSet(pkt->getAddr());
 
         if (std::find(indexingPolicy->FOLLOWSETS.begin(), indexingPolicy->FOLLOWSETS.end(), setOfBlock) != indexingPolicy->FOLLOWSETS.end()){
             if (choosePolicy == 0){
+                //std::cout << "FOLLOW SET LIP"  << std::endl;
                 replacementPolicy->flag = 0;
                 replacementPolicy->reset(blk->replacementData);
             }
             //else a value of 1 which means that the block is set to use the BIP policy
             else{
+                 //std::cout << "FOLLOW SET BIP"  << std::endl;
                 replacementPolicy->flag = 1;
                 replacementPolicy->reset(blk->replacementData);
             }
         }
         else if (std::find(indexingPolicy->LRUSETS.begin(), indexingPolicy->LRUSETS.end(), setOfBlock) != indexingPolicy->LRUSETS.end()){
+            // std::cout << "LRU SET"  << std::endl;
             replacementPolicy->flag = 0;
             replacementPolicy->reset(blk->replacementData);
 
         }
         else if (std::find(indexingPolicy->BIPSETS.begin(), indexingPolicy->BIPSETS.end(), setOfBlock) != indexingPolicy->BIPSETS.end()){
+            // std::cout << "BIP SET"  << std::endl;
             replacementPolicy->flag = 1;
             replacementPolicy->reset(blk->replacementData);
         }

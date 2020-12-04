@@ -68,45 +68,45 @@ BaseSetAssoc::tagsInit()
     // All the BIP sets have position from 32, 64, ...
     //std::cout << "The number of blocks are: " << numBlocks << std::endl;    
 
-    int setDuelingSize = numBlocks / 32;
+    //int setDuelingSize = numBlocks / 32;
 
     //std::cout << "The set Dueling size is: : " << setDuelingSize << std::endl;
 
     for (unsigned blk_index = 0; blk_index < numBlocks; blk_index++) {
         // Locate next cache block
         CacheBlk* blk = &blks[blk_index];
-        if (blk_index == 0 || blk_index % (setDuelingSize + 1) == 0){
+        //if (blk_index == 0 || blk_index % (setDuelingSize + 1) == 0){
             //set up for LRU
             //CacheBlk* blk = &blks[blk_index];
-            LRUsets.push_back(blk);
+            //LRUsets.push_back(blk);
             indexingPolicy->setEntry(blk, blk_index);
             blk->data = &dataBlks[blkSize*blk_index];
             blk->replacementData = replacementPolicy->instantiateEntry();
             //all the LRU blocks use the flag value of 0 when accessing the reset function
-            blockMap.insert ( std::pair<CacheBlk*, int>(blk, 0)); 
+            //blockMap.insert ( std::pair<CacheBlk*, int>(blk, 0)); 
 
-        }
-        else if (blk_index != 0 && blk_index % (setDuelingSize - 1) == 0){
+        //}
+        //else if (blk_index != 0 && blk_index % (setDuelingSize - 1) == 0){
 
             //set up for BIP
-            BIPsets.push_back(blk);
-            indexingPolicy->setEntry(blk, blk_index);
-            blk->data = &dataBlks[blkSize*blk_index];
-            blk->replacementData = replacementPolicy->instantiateEntry();   
+           // BIPsets.push_back(blk);
+            //indexingPolicy->setEntry(blk, blk_index);
+           // blk->data = &dataBlks[blkSize*blk_index];
+           // blk->replacementData = replacementPolicy->instantiateEntry();   
             //all the BIP sets use the flag value of 1 when accessing the reset function
-            blockMap.insert ( std::pair<CacheBlk*, int>(blk, 1)); 
+           // blockMap.insert ( std::pair<CacheBlk*, int>(blk, 1)); 
 
-        }
-        else{
+       // }
+       // else{
             //follwer set
             //set default replacement policy to LRU
-            followerSets.push_back(blk);
-            indexingPolicy->setEntry(blk, blk_index);
-            blk->data = &dataBlks[blkSize*blk_index];
-            blk->replacementData = replacementPolicy->instantiateEntry();
-            blockMap.insert ( std::pair<CacheBlk*, int>(blk, 0));    
+            //followerSets.push_back(blk);
+           // indexingPolicy->setEntry(blk, blk_index);
+           // blk->data = &dataBlks[blkSize*blk_index];
+          //  blk->replacementData = replacementPolicy->instantiateEntry();
+          //  blockMap.insert ( std::pair<CacheBlk*, int>(blk, 0));    
 
-        }
+        //}
     }
 }
 

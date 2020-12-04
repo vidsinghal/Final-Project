@@ -1146,15 +1146,11 @@ BaseCache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
 
     // Access block in the tags
     Cycles tag_latency(0);
-    blk = tags->accessBlock(pkt->getAddr(), pkt->isSecure(), tag_latency);
+    
     //Here inside accessBlock I can access the which set this query belongs to
-
-
-
-
-
-
-
+    //accessBlock is the place where I can determine it it hit in the cache or missed
+    
+    blk = tags->accessBlock(pkt->getAddr(), pkt->isSecure(), tag_latency);    
 
     DPRINTF(Cache, "%s for %s %s\n", __func__, pkt->print(),
             blk ? "hit " + blk->print() : "miss");

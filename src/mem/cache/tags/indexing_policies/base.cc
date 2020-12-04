@@ -64,14 +64,14 @@ BaseIndexingPolicy::BaseIndexingPolicy(const Params *p)
 
     // Make space for the entries
     //std::cout << "set size: " << numSets << std::endl;
-    int IndexingOfSets = numSets / 32;
+    int IndexingOfSets = numSets / 64;
 
     for (uint32_t i = 0; i < numSets; ++i) {
 
-        if (i == 0 || (i % (IndexingOfSets + 1)) == 0){
+        if (i == 0 || ((i % (IndexingOfSets + 1)) == 0)){
             LRUSETS.push_back(i);
         }
-        else if(i != 0 && (i % (IndexingOfSets - 1)) == 0){
+        else if(i != 0 && ((i % (IndexingOfSets - 1)) == 0)){
             BIPSETS.push_back(i);
         }
         else{
