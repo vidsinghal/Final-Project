@@ -20,12 +20,13 @@ class PRP : public BaseReplacementPolicy
 
         int blockAge; //T_L in the paper
 
+        float finalBlkProbability;
         //check if you need valid bit
         
         /**
          * Default constructor. Invalidate data.
          */
-        PRPReplData() : lastTouchTick(0), refCount(0), blockAge(0) 
+        PRPReplData() : lastTouchTick(0), refCount(0), finalBlkProbability(0) 
         {            
         }
         

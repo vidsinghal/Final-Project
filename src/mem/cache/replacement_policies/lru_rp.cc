@@ -80,6 +80,12 @@ LRURP::getVictim(const ReplacementCandidates& candidates) const
                     victim->replacementData)->lastTouchTick) {
             victim = candidate;
         }
+/*         printf("FD_rp\t");
+        for(int i=0;i<6;i++) //when one bin goes over 15 all are halved
+        {
+            printf("%d\t",candidate->reuseFrequency[i]);
+        }
+        printf("\n"); */
     }
 
     return victim;

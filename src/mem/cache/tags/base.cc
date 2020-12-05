@@ -59,13 +59,9 @@
 #include <map> 
 
 std::map<Addr, CacheBlk*> mpAddrCacheBlk; //mapping the address and cache blk
-std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_addr_blk_max;
-std::map<unsigned long, CacheBlk*> mpReuseDistCacheBlk; //mapping the reuse distance and the cache blk
-std::map<unsigned long, CacheBlk*>::iterator it_reuse_blk;
 unsigned long reuseDistance;
-//parameters required for reuse frequency bins
-int reuseFrequency[6];
-std::vector<std::vector<int>> reuseBinRange(6);
+std::vector<std::vector<int>> reuseBinRange(6);//reuse frequency bin limits
+std::map<Addr, CacheBlk*>::iterator it_addr_blk;
 
 BaseTags::BaseTags(const Params *p)
     : ClockedObject(p), blkSize(p->block_size), blkMask(blkSize - 1),
@@ -107,35 +103,37 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
     // Find possible entries that may contain the given address
     const std::vector<ReplaceableEntry*> entries =
         indexingPolicy->getPossibleEntries(addr);
-
+        
     it_addr_blk = mpAddrCacheBlk.find(addr);                            //search for block in map
-    it_addr_blk_max = mpAddrCacheBlk.end();                             //element just before end
     
     if(it_addr_blk != mpAddrCacheBlk.end()){                            //find if address is already present
-        
-        reuseDistance = std::distance(it_addr_blk, it_addr_blk_max);    //reuse distance calculation
-        mpReuseDistCacheBlk.insert({reuseDistance, it_addr_blk->second});
-        
-        mpAddrCacheBlk.erase(addr);                                     //remove block and add it again
-        mpAddrCacheBlk.insert({addr, it_addr_blk->second});
+        //reuse distance calculation
+        reuseDistance = std::distance(it_addr_blk, mpAddrCacheBlk.end());    
+                
         // printf("ReuseDist:%lu\n",reuseDistance);
-
+        // printf("FD_tag\t");
+        //update frequency bins
         for(int i=0;i<6;i++)            //incrementing reuse frequency bins
         {
             auto it = std::find(reuseBinRange.at(i).begin(), reuseBinRange.at(i).end(), reuseDistance);
         
             if(it != reuseBinRange.at(i).end())
             {
-                reuseFrequency[i]++;
+                it_addr_blk->second->reuseFrequency[i]++;
             }
-            if (reuseFrequency[i] > 15)
+            if (it_addr_blk->second->reuseFrequency[i] > 15)
             {
                 for(int i=0;i<6;i++) //when one bin goes over 15 all are halved
                 {
-                    reuseFrequency[i] = reuseFrequency[i]/2;
+                    it_addr_blk->second->reuseFrequency[i] = it_addr_blk->second->reuseFrequency[i]/2;
                 }
             }
+            // printf("%d\t",it_addr_blk->second->reuseFrequency[i]);
         }
+        // printf("\n");
+        //remove block and add it again - to reset - but does it? - kindof in mpAddrCacheBlk
+        mpAddrCacheBlk.erase(addr);                                     
+        mpAddrCacheBlk.insert({addr, it_addr_blk->second});
         /*         
         if ((it_addr_blk->second->tag == tag) && it_addr_blk->second->isValid() &&      //causes an error
         (it_addr_blk->second->isSecure() == is_secure)) {
@@ -171,8 +169,19 @@ BaseTags::insertBlock(const PacketPtr pkt, CacheBlk *blk)
     // Insert block with tag, src master id and task id
     blk->insert(extractTag(pkt->getAddr()), pkt->isSecure(), master_id,
                 pkt->req->taskId());
-
+    
+    for(int i=0;i<6;i++)//init all elements in distriution_array to zero
+    {
+        blk->reuseFrequency[i] = 0;
+    }
     mpAddrCacheBlk.insert({pkt->getAddr(), blk});
+
+/*     printf("FD_insert\t");
+    for(int i=0;i<6;i++) //when one bin goes over 15 all are halved
+    {
+        printf("%d\t",blk->reuseFrequency[i]);
+    }
+    printf("\n"); */
     
     // Check if cache warm up is done
     if (!warmedUp && stats.tagsInUse.value() >= warmupBound) {
