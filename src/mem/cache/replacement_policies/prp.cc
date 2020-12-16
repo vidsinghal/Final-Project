@@ -3,7 +3,7 @@
 #include <cassert>
 #include <memory>
 
-// #include "params/PRP.hh"
+#include "params/PRP.hh"
 
 #include "base/logging.hh" // For fatal_if
 #include "base/random.hh"
