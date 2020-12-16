@@ -178,6 +178,12 @@ class BaseSetAssoc : public BaseTags
         // There is only one eviction for this replacement
         evict_blks.push_back(victim);
 
+        auto it_addr_blk = std::find(vecBlk.begin(), vecBlk.end(), victim);
+        if(it_addr_blk != vecBlk.end()){
+            std::rotate(it_addr_blk, it_addr_blk + 1, vecBlk.end());
+            vecBlk.pop_back();
+        }
+
         return victim;
     }
 

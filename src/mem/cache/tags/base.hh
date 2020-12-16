@@ -162,7 +162,7 @@ class BaseTags : public ClockedObject
      * Destructor.
      */
     virtual ~BaseTags() {}
-
+    std::vector<CacheBlk*> vecBlk;
     /**
      * Initialize blocks. Must be overriden by every subclass that uses
      * a block type different from its parent's, as the current Python

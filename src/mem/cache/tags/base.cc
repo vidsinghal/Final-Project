@@ -55,6 +55,11 @@
 #include "sim/sim_exit.hh"
 #include "sim/system.hh"
 
+// std::map<CacheBlk*, Addr> mpAddrCacheBlk; //mapping the address and cache blk
+unsigned long reuseDistance;
+// std::vector<CacheBlk*> vecBlk;
+// std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_max;
+
 BaseTags::BaseTags(const Params *p)
     : ClockedObject(p), blkSize(p->block_size), blkMask(blkSize - 1),
       size(p->size), lookupLatency(p->tag_latency),
@@ -88,6 +93,17 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
         CacheBlk* blk = static_cast<CacheBlk*>(location);
         if ((blk->tag == tag) && blk->isValid() &&
             (blk->isSecure() == is_secure)) {
+                //use 2 vectors, change everything below
+            // auto it_addr_blk = vecPair.find(blk);
+            auto it_blk = std::find(vecBlk.begin(), vecBlk.end(), blk);
+            if(it_blk != vecBlk.end()){                            //find if address is already present
+                //reuse distance calculation
+                reuseDistance = std::distance(it_blk, vecBlk.end()) - 1; 
+                // std::rotate(it_blk, it_blk + 1, vecBlk.end()); //because of 'const' in findBlock - reuseDist is wrong
+/*                 std::cout<<"size of vector"<<vecBlk.size()<<'\n';
+                std::cout<<"capacity of vector"<<vecBlk.capacity()<<'\n'; */
+            }
+
             return blk;
         }
     }
@@ -112,6 +128,8 @@ BaseTags::insertBlock(const PacketPtr pkt, CacheBlk *blk)
     // Insert block with tag, src master id and task id
     blk->insert(extractTag(pkt->getAddr()), pkt->isSecure(), master_id,
                 pkt->req->taskId());
+
+    vecBlk.push_back(blk);
 
     // Check if cache warm up is done
     if (!warmedUp && stats.tagsInUse.value() >= warmupBound) {
