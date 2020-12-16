@@ -193,7 +193,7 @@ SectorTags::insertBlock(const PacketPtr pkt, CacheBlk *blk)
 }
 
 CacheBlk*
-SectorTags::findBlock(Addr addr, bool is_secure) const
+SectorTags::findBlock(Addr addr, bool is_secure) 
 {
     // Extract sector tag
     const Addr tag = extractTag(addr);

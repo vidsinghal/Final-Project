@@ -57,6 +57,7 @@
 
 // std::map<CacheBlk*, Addr> mpAddrCacheBlk; //mapping the address and cache blk
 unsigned long reuseDistance;
+// std::vector<CacheBlk *> vecBlkCopy;
 // std::vector<CacheBlk*> vecBlk;
 // std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_max;
 
@@ -78,8 +79,15 @@ BaseTags::findBlockBySetAndWay(int set, int way) const
     return indexingPolicy->getEntry(set, way);
 }
 
+/* void
+sendBlk2Back(std::vector<CacheBlk*> vecBlk)
+{
+    vecBlk = vecBlkCopy;
+} */
+
+
 CacheBlk*
-BaseTags::findBlock(Addr addr, bool is_secure) const
+BaseTags::findBlock(Addr addr, bool is_secure) 
 {
     // Extract block tag
     Addr tag = extractTag(addr);
@@ -95,11 +103,15 @@ BaseTags::findBlock(Addr addr, bool is_secure) const
             (blk->isSecure() == is_secure)) {
                 //use 2 vectors, change everything below
             // auto it_addr_blk = vecPair.find(blk);
+            //vecBlkCopy = vecBlk;
             auto it_blk = std::find(vecBlk.begin(), vecBlk.end(), blk);
+            //auto it = std::find(vecBlkCopy.begin(), vecBlkCopy.end(), blk);
             if(it_blk != vecBlk.end()){                            //find if address is already present
                 //reuse distance calculation
                 reuseDistance = std::distance(it_blk, vecBlk.end()) - 1; 
-                // std::rotate(it_blk, it_blk + 1, vecBlk.end()); //because of 'const' in findBlock - reuseDist is wrong
+                //std::rotate(it, it + 1, vecBlkCopy.end()); //because of 'const' in findBlock - reuseDist is wrong
+                //sendBlk2Back(vecBlk);
+                std::rotate(it_blk, it_blk + 1, vecBlk.end());
 /*                 std::cout<<"size of vector"<<vecBlk.size()<<'\n';
                 std::cout<<"capacity of vector"<<vecBlk.capacity()<<'\n'; */
             }

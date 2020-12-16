@@ -166,7 +166,7 @@ FALRU::accessBlock(Addr addr, bool is_secure, Cycles &lat,
 }
 
 CacheBlk*
-FALRU::findBlock(Addr addr, bool is_secure) const
+FALRU::findBlock(Addr addr, bool is_secure) 
 {
     FALRUBlk* blk = nullptr;
 

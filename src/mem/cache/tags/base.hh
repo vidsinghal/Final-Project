@@ -163,6 +163,7 @@ class BaseTags : public ClockedObject
      */
     virtual ~BaseTags() {}
     std::vector<CacheBlk*> vecBlk;
+
     /**
      * Initialize blocks. Must be overriden by every subclass that uses
      * a block type different from its parent's, as the current Python
@@ -193,7 +194,7 @@ class BaseTags : public ClockedObject
      * @param is_secure True if the target memory space is secure.
      * @return Pointer to the cache block.
      */
-    virtual CacheBlk *findBlock(Addr addr, bool is_secure) const;
+    virtual CacheBlk *findBlock(Addr addr, bool is_secure) ;
 
     /**
      * Find a block given set and way.
@@ -360,5 +361,8 @@ class BaseTagsCallback : public Callback
     BaseTagsCallback(BaseTags *t) : tags(t) {}
     virtual void process() { tags->cleanupRefs(); };
 };
+
+/*To use std::rotate*/
+// void sendBlk2Back(std::vector<CacheBlk *> vecBlk);
 
 #endif //__MEM_CACHE_TAGS_BASE_HH__

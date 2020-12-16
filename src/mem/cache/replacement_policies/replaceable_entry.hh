@@ -72,7 +72,8 @@ class ReplaceableEntry
      * It must be instantiated by the replacement policy before being used.
      */
     std::shared_ptr<ReplacementData> replacementData;
-
+    /*reuseFrequency distribution required for PRP*/
+    int reuseFrequency[6];
     /**
      * Set both the set and way. Should be called only once.
      *
