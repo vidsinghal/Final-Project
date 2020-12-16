@@ -59,6 +59,8 @@
 unsigned long reuseDistance;
 // std::vector<CacheBlk*> vecBlk;
 // std::map<Addr, CacheBlk*>::iterator it_addr_blk, it_max;
+int upper[] = { 16, 32, 64, 128, 256};
+int lower[] = { 0, 16, 32, 64, 128};
 
 BaseTags::BaseTags(const Params *p)
     : ClockedObject(p), blkSize(p->block_size), blkMask(blkSize - 1),
@@ -102,9 +104,26 @@ BaseTags::findBlock(Addr addr, bool is_secure)
                 //reuse distance calculation
                 reuseDistance = std::distance(it_blk, vecBlk.end()) - 1; 
                 std::rotate(it_blk, it_blk + 1, vecBlk.end());
+                        //update frequency bins
+                if(reuseDistance > 255)
+                {
+                    blk->reuseFrequency[5]++;
+                }
+                
+                for (int i = 0; i < 5; i++){
+                    if ((reuseDistance < upper[i]) && (reuseDistance >= lower[i])){
+                        blk->reuseFrequency[i]++;
+                    }   
+                    if (blk->reuseFrequency[i] > 15 || blk->reuseFrequency[5] > 15)
+                    {
+                        for(int i=0;i<6;i++) //when one bin goes over 15 all are halved
+                        {
+                            blk->reuseFrequency[i] = blk->reuseFrequency[i]/2;
+                        }
+                    }           
+                }
 /*                 std::cout<<"size of vector"<<vecBlk.size()<<'\n';
                 std::cout<<"capacity of vector"<<vecBlk.capacity()<<'\n'; */
-                blk->reuseFrequency
             }
 
             return blk;
@@ -133,6 +152,7 @@ BaseTags::insertBlock(const PacketPtr pkt, CacheBlk *blk)
                 pkt->req->taskId());
 
     vecBlk.push_back(blk);
+    memset(blk->reuseFrequency, 0, sizeof(blk->reuseFrequency));
 
     // Check if cache warm up is done
     if (!warmedUp && stats.tagsInUse.value() >= warmupBound) {
