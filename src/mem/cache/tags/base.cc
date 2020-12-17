@@ -95,21 +95,16 @@ BaseTags::findBlock(Addr addr, bool is_secure)
         CacheBlk* blk = static_cast<CacheBlk*>(location);
         if ((blk->tag == tag) && blk->isValid() &&
             (blk->isSecure() == is_secure)) {
-                //use 2 vectors, change everything below
-            // auto it_addr_blk = vecPair.find(blk);
-            //vecBlkCopy = vecBlk;
             auto it_blk = std::find(vecBlk.begin(), vecBlk.end(), blk);
-            //auto it = std::find(vecBlkCopy.begin(), vecBlkCopy.end(), blk);
             if(it_blk != vecBlk.end()){                            //find if address is already present
                 //reuse distance calculation
                 reuseDistance = std::distance(it_blk, vecBlk.end()) - 1; 
-                std::rotate(it_blk, it_blk + 1, vecBlk.end());
-                        //update frequency bins
+                std::rotate(it_blk, it_blk + 1, vecBlk.end()); //move blk to the end
+                //update frequency bins
                 if(reuseDistance > 255)
                 {
                     blk->reuseFrequency[5]++;
                 }
-                
                 for (int i = 0; i < 5; i++){
                     if ((reuseDistance < upper[i]) && (reuseDistance >= lower[i])){
                         blk->reuseFrequency[i]++;
@@ -122,8 +117,6 @@ BaseTags::findBlock(Addr addr, bool is_secure)
                         }
                     }           
                 }
-/*                 std::cout<<"size of vector"<<vecBlk.size()<<'\n';
-                std::cout<<"capacity of vector"<<vecBlk.capacity()<<'\n'; */
             }
 
             return blk;

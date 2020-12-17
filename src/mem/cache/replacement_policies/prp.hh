@@ -18,10 +18,9 @@ class PRP : public BaseReplacementPolicy
         /** Number of references to this entry since it was reset. */
         unsigned refCount;
 
-        int blockAge; //T_L in the paper
+        // int blockAge; //T_L in the paper
 
         float finalBlkProbability;
-        //check if you need valid bit
         
         /**
          * Default constructor. Invalidate data.
@@ -31,11 +30,7 @@ class PRP : public BaseReplacementPolicy
         }
         
     };
-
-    int blockAge; //maybe not needed
     
-    // float cacheDistribution;//need to add cache probability distribution
-  
   public:
     
     typedef PRPParams Params;

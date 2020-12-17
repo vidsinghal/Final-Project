@@ -14,7 +14,7 @@ int reuseFrequencySum;
 float numerator;
 
 PRP::PRP(const Params *p)
-    : BaseReplacementPolicy(p)//may need to map parameter like in brrip
+    : BaseReplacementPolicy(p)
 {
 }
 
