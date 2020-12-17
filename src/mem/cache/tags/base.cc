@@ -144,8 +144,8 @@ BaseTags::insertBlock(const PacketPtr pkt, CacheBlk *blk)
     blk->insert(extractTag(pkt->getAddr()), pkt->isSecure(), master_id,
                 pkt->req->taskId());
 
-    vecBlk.push_back(blk);
-    memset(blk->reuseFrequency, 0, sizeof(blk->reuseFrequency));
+    vecBlk.push_back(blk);//adding inserted block into the vector
+    memset(blk->reuseFrequency, 0, sizeof(blk->reuseFrequency)); //reseting elements to 0
 
     // Check if cache warm up is done
     if (!warmedUp && stats.tagsInUse.value() >= warmupBound) {

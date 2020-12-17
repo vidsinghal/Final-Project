@@ -177,7 +177,7 @@ class BaseSetAssoc : public BaseTags
 
         // There is only one eviction for this replacement
         evict_blks.push_back(victim);
-
+        //remove victim block from vector
         auto it_addr_blk = std::find(vecBlk.begin(), vecBlk.end(), victim);
         if(it_addr_blk != vecBlk.end()){
             std::rotate(it_addr_blk, it_addr_blk + 1, vecBlk.end());

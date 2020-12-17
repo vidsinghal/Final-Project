@@ -51,7 +51,7 @@ PRP::getVictim(const ReplacementCandidates& candidates) const
 
     // Visit all candidates to find victim
     ReplaceableEntry* victim = candidates[0];
-    for(int i=0;i<6;i++) 
+    for(int i=0;i<6;i++) //final hit probability for candidates[0]
         {
             reuseFrequencySum += victim->reuseFrequency[i];
             numerator += (victim->reuseFrequency[i]*hitProbability[i]);
@@ -60,7 +60,7 @@ PRP::getVictim(const ReplacementCandidates& candidates) const
             victim->replacementData)->finalBlkProbability = numerator/reuseFrequencySum;
 
     for (const auto& candidate : candidates) {
-        for(int i=0;i<6;i++) 
+        for(int i=0;i<6;i++) //final hit probability calculation
         {
             reuseFrequencySum += candidate->reuseFrequency[i];
             numerator += (candidate->reuseFrequency[i]*hitProbability[i]);
