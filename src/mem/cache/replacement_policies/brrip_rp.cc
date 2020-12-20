@@ -70,6 +70,16 @@ BRRIPRP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 }
 
 void
+BRRIPRP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+}
+
+void
+BRRIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 BRRIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     std::shared_ptr<BRRIPReplData> casted_replacement_data =

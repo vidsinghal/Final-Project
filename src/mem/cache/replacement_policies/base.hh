@@ -76,6 +76,8 @@ class BaseReplacementPolicy : public SimObject
      */
     virtual void touch(const std::shared_ptr<ReplacementData>&
                                                 replacement_data) const = 0;
+    virtual void touch(const std::shared_ptr<ReplacementData>& replacement_data,
+                               const ReplacementCandidates& candidates) const = 0;
 
     /**
      * Reset replacement data. Used when it's holder is inserted/validated.
@@ -84,6 +86,8 @@ class BaseReplacementPolicy : public SimObject
      */
     virtual void reset(const std::shared_ptr<ReplacementData>&
                                                 replacement_data) const = 0;
+    virtual void reset(const std::shared_ptr<ReplacementData>& replacement_data,
+                               const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const = 0;
 
     /**
      * Find replacement victim among candidates.

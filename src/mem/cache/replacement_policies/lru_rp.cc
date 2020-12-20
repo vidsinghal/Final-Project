@@ -56,6 +56,22 @@ LRURP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 }
 
 void
+LRURP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+    // Update last touch timestamp
+    std::static_pointer_cast<LRUReplData>(
+        replacement_data)->lastTouchTick = curTick();
+}
+
+void
+LRURP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+    // Set last touch timestamp
+    std::static_pointer_cast<LRUReplData>(
+        replacement_data)->lastTouchTick = curTick();
+}
+
+void
 LRURP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     // Set last touch timestamp

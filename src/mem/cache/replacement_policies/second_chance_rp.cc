@@ -71,6 +71,16 @@ SecondChanceRP::touch(const std::shared_ptr<ReplacementData>&
 }
 
 void
+SecondChanceRP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+}
+
+void
+SecondChanceRP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 SecondChanceRP::reset(const std::shared_ptr<ReplacementData>&
                                                     replacement_data) const
 {

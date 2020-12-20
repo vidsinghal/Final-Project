@@ -84,6 +84,16 @@ class BaseSetAssoc : public BaseTags
     /** Replacement policy */
     BaseReplacementPolicy *replacementPolicy;
 
+    /** Cache Access Counter */
+    uint64_t CacheAccessCount = 0;
+
+    /** Cache Miss Counter */
+    uint64_t CacheMissCount = 0;
+    uint64_t Cache100KAccessMissCount = 0;
+
+    /** Cache SCORE RP Inital Score */
+    uint64_t SCORERPInitialScore = 16;
+
   public:
     /** Convenience typedef. */
      typedef BaseSetAssocParams Params;
@@ -126,6 +136,10 @@ class BaseSetAssoc : public BaseTags
     {
         CacheBlk *blk = findBlock(addr, is_secure);
 
+        // Get possible entries
+        const std::vector<ReplaceableEntry*> entries =
+            indexingPolicy->getPossibleEntries(addr);
+
         // Access all tags in parallel, hence one in each way.  The data side
         // either accesses all blocks in parallel, or one block sequentially on
         // a hit.  Sequential access with a miss doesn't access data.
@@ -144,7 +158,40 @@ class BaseSetAssoc : public BaseTags
             blk->refCount++;
 
             // Update replacement data of accessed block
-            replacementPolicy->touch(blk->replacementData);
+            replacementPolicy->touch(blk->replacementData,entries);
+        } else {
+	    // Update Cache Miss Count
+	    CacheMissCount++;
+	}
+
+	// Update Cache Access Count
+	// 100K Cache Access Saturation
+	if (CacheAccessCount == 100000) {
+
+            if (CacheMissCount < Cache100KAccessMissCount) {
+		// SCORE RP Intial Score = 16
+		// SCORE RP Intial Score Step = 8
+		// SCORE RP Maximum Score = 64
+		if (SCORERPInitialScore > 56) {
+		   SCORERPInitialScore = 64;
+		} else {
+		   SCORERPInitialScore = SCORERPInitialScore + 8;
+		}
+            } else {
+		if (SCORERPInitialScore < 8) {
+		   SCORERPInitialScore = 0;
+		} else {
+		   SCORERPInitialScore = SCORERPInitialScore - 8;
+		}
+            }
+
+            Cache100KAccessMissCount = CacheMissCount;
+
+	    CacheAccessCount = 0;
+	    CacheMissCount = 0;
+
+        } else {
+	    CacheAccessCount++;
         }
 
         // The tag lookup latency is the same for a hit or a miss
@@ -196,7 +243,13 @@ class BaseSetAssoc : public BaseTags
         stats.tagsInUse++;
 
         // Update replacement policy
-        replacementPolicy->reset(blk->replacementData);
+        //
+        Addr addr = indexingPolicy->regenerateAddr(blk->tag, blk);
+        // Get possible entries 
+        const std::vector<ReplaceableEntry*> entries =
+            indexingPolicy->getPossibleEntries(addr);
+
+        replacementPolicy->reset(blk->replacementData,entries,SCORERPInitialScore);
     }
 
     /**

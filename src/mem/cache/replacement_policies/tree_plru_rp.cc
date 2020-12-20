@@ -156,6 +156,16 @@ const
 }
 
 void
+TreePLRURP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+}
+
+void
+TreePLRURP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 TreePLRURP::reset(const std::shared_ptr<ReplacementData>& replacement_data)
 const
 {

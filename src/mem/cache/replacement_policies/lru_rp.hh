@@ -85,6 +85,8 @@ class LRURP : public BaseReplacementPolicy
      */
     void touch(const std::shared_ptr<ReplacementData>& replacement_data) const
                                                                      override;
+    void touch(const std::shared_ptr<ReplacementData>& replacement_data,
+                               const ReplacementCandidates& candidates) const;
 
     /**
      * Reset replacement data. Used when an entry is inserted.
@@ -94,6 +96,8 @@ class LRURP : public BaseReplacementPolicy
      */
     void reset(const std::shared_ptr<ReplacementData>& replacement_data) const
                                                                      override;
+    void reset(const std::shared_ptr<ReplacementData>& replacement_data,
+                               const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const;
 
     /**
      * Find replacement victim using LRU timestamps.

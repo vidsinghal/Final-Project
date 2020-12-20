@@ -39,6 +39,11 @@ BIPRP::BIPRP(const Params *p)
 }
 
 void
+BIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 BIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     std::shared_ptr<LRUReplData> casted_replacement_data =

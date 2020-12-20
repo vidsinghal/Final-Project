@@ -53,6 +53,15 @@ class LRURP(BaseReplacementPolicy):
     cxx_class = 'LRURP'
     cxx_header = "mem/cache/replacement_policies/lru_rp.hh"
 
+class SCORERP(BaseReplacementPolicy):
+    type = 'SCORERP'
+    cxx_class = 'SCORERP'
+    cxx_header = "mem/cache/replacement_policies/score_rp.hh"
+    SCOREMax = Param.Int(64, "Maximum SCORE")
+    SCOREThreshold = Param.Int(24, "Threshold SCORE")
+    SCOREIncreaseVel = Param.Int(40, "Increase Velocity SCORE")
+    SCOREDecreaseVel = Param.Int(1, "Decrease Velocity SCORE")
+
 class BIPRP(LRURP):
     type = 'BIPRP'
     cxx_class = 'BIPRP'
