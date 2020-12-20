@@ -54,6 +54,16 @@ RandomRP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 }
 
 void
+RandomRP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+}
+
+void
+RandomRP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 RandomRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     // Unprioritize replacement data victimization

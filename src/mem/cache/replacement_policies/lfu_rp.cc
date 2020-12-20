@@ -54,6 +54,16 @@ LFURP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 }
 
 void
+LFURP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+}
+
+void
+LFURP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 LFURP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     // Reset reference count

@@ -54,6 +54,16 @@ FIFORP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 }
 
 void
+FIFORP::touch(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates) const
+{
+}
+
+void
+FIFORP::reset(const std::shared_ptr<ReplacementData>& replacement_data, const ReplacementCandidates& candidates, uint64_t SCORERPInitialScore) const
+{
+}
+
+void
 FIFORP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
     // Set insertion tick
